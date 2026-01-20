@@ -1,0 +1,115 @@
+#include <SoftwareSerial.h>
+
+// Define motor driver pins
+#define IN1 3  // Motor A input 1
+#define IN2 4  // Motor A input 2
+#define IN3 5  // Motor B input 1
+#define IN4 6  // Motor B input 2
+
+// Define light and horn pins
+#define RED_LIGHT_PIN1 10
+#define RED_LIGHT_PIN2 12
+#define WHITE_LIGHT_PIN 9
+#define HORN_PIN A0
+
+// Bluetooth module pins (RX, TX)
+SoftwareSerial BT(0, 1);
+
+void setup() {
+    // Motor driver pins
+    pinMode(IN1, OUTPUT);
+    pinMode(IN2, OUTPUT);
+    pinMode(IN3, OUTPUT);
+    pinMode(IN4, OUTPUT);
+
+    // Light and horn pins
+    pinMode(RED_LIGHT_PIN1, OUTPUT);
+    pinMode(WHITE_LIGHT_PIN, OUTPUT);
+   pinMode(RED_LIGHT_PIN2, OUTPUT);
+    pinMode(HORN_PIN, OUTPUT);
+
+    BT.begin(9600); // Start Bluetooth communication
+    Serial.begin(9600); // Start Serial Monitor (optional)
+}
+
+// Function to move forward
+void moveForward() {
+    digitalWrite(IN1, HIGH);
+    digitalWrite(IN2, LOW);
+    digitalWrite(IN3, HIGH);
+    digitalWrite(IN4, LOW);
+    digitalWrite(WHITE_LIGHT_PIN, HIGH);
+    digitalWrite(RED_LIGHT_PIN1, LOW);
+    digitalWrite(RED_LIGHT_PIN2, LOW);
+}
+
+// Function to move backward
+void moveBackward() {
+    digitalWrite(IN1, LOW);
+    digitalWrite(IN2, HIGH);
+    digitalWrite(IN3, LOW);
+    digitalWrite(IN4, HIGH);
+    digitalWrite(WHITE_LIGHT_PIN, HIGH);
+    digitalWrite(RED_LIGHT_PIN1, HIGH);
+     digitalWrite(RED_LIGHT_PIN2, HIGH);
+}
+
+// Function to turn left
+void turnLeft() {
+    digitalWrite(IN1, LOW);
+    digitalWrite(IN2, HIGH);
+    digitalWrite(IN3, HIGH);
+    digitalWrite(IN4, LOW);
+     digitalWrite(WHITE_LIGHT_PIN, HIGH);
+     digitalWrite(RED_LIGHT_PIN1, HIGH);
+      digitalWrite(RED_LIGHT_PIN2, LOW);
+}
+
+// Function to turn right
+void turnRight() {
+    digitalWrite(IN1, HIGH);
+    digitalWrite(IN2, LOW);
+    digitalWrite(IN3, LOW);
+    digitalWrite(IN4, HIGH);
+     digitalWrite(WHITE_LIGHT_PIN, HIGH);
+      digitalWrite(RED_LIGHT_PIN2, HIGH);
+      digitalWrite(RED_LIGHT_PIN1, LOW);
+}
+
+// Function to stop
+void stopCar() {
+    digitalWrite(IN1, LOW);
+    digitalWrite(IN2, LOW);
+    digitalWrite(IN3, LOW);
+    digitalWrite(IN4, LOW);
+    digitalWrite(WHITE_LIGHT_PIN, LOW);
+    digitalWrite(RED_LIGHT_PIN1, HIGH);
+    digitalWrite(RED_LIGHT_PIN2, HIGH);
+}
+
+// Function to control horn
+void controlHornON() {   
+  digitalWrite(HORN_PIN, HIGH);
+}
+void controlHornOFF() {   
+  digitalWrite(HORN_PIN, LOW);
+}
+void loop() {
+    // Check for Bluetooth commands
+    if (BT.available()) {
+        char command = BT.read();
+        Serial.println(command); // Print received command (optional)
+
+        switch (command) {
+            case 'F': moveForward(); break;
+            case 'B': moveBackward(); break;
+            case 'L': turnLeft(); break;
+            case 'R': turnRight(); 
+            break;
+            case 'V': controlHornON(); break;
+            case 'v': controlHornOFF(); break;
+            case 'S': stopCar(); break;
+            default: stopCar(); // Stop if invalid command
+        }
+    }
+}
